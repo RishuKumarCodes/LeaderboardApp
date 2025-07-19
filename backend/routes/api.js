@@ -4,7 +4,7 @@ import ClaimHistory from "../models/ClaimHistory.js";
 
 const router = express.Router();
 
-// GET /users - Get all users sorted by totalPoints (descending)
+// Get all users
 router.get("/users", async (req, res) => {
   try {
     const users = await User.find().sort({ totalPoints: -1 });
@@ -14,7 +14,7 @@ router.get("/users", async (req, res) => {
   }
 });
 
-// POST /users - Add a new user
+// Add a new user
 router.post("/users", async (req, res) => {
   try {
     const { name } = req.body;
@@ -37,7 +37,7 @@ router.post("/users", async (req, res) => {
   }
 });
 
-// POST /claim - Award random points to a user
+// Award random points
 router.post("/claim", async (req, res) => {
   try {
     const { userId } = req.body;
@@ -51,14 +51,11 @@ router.post("/claim", async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    // Generate random points between 1-10
     const pointsAwarded = Math.floor(Math.random() * 10) + 1;
 
-    // Update user's total points
     user.totalPoints += pointsAwarded;
     await user.save();
 
-    // Create claim history record
     const claimHistory = new ClaimHistory({
       userId: user._id,
       pointsAwarded,
@@ -66,7 +63,6 @@ router.post("/claim", async (req, res) => {
     });
     await claimHistory.save();
 
-    // Emit real-time update to all connected clients
     const io = req.app.get("io");
     const updatedUsers = await User.find().sort({ totalPoints: -1 });
     io.emit("leaderboardUpdate", updatedUsers);
@@ -81,7 +77,6 @@ router.post("/claim", async (req, res) => {
   }
 });
 
-// GET /history/:userId - Get claim history for a user
 router.get("/history/:userId", async (req, res) => {
   try {
     const { userId } = req.params;

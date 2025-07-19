@@ -18,14 +18,11 @@ const io = new socketIo(server, {
   },
 });
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Make io accessible to our routes
 app.set("io", io);
 
-// Connect to MongoDB
 mongoose
   .connect(process.env.MONGODB_URI || "mongodb://localhost:27017/leaderboard", {
     useNewUrlParser: true,
@@ -34,7 +31,6 @@ mongoose
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-// Socket.IO connection handling
 io.on("connection", (socket) => {
   console.log("New client connected:", socket.id);
 
@@ -43,10 +39,8 @@ io.on("connection", (socket) => {
   });
 });
 
-// API routes
 app.use("/api", apiRoutes);
 
-// Health check endpoint
 app.get("/health", (req, res) => {
   res.json({ status: "OK", timestamp: new Date().toISOString() });
 });
