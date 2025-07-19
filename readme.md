@@ -78,4 +78,5 @@ leaderboard-app/
 ### Frontend Configuration
 
 - Proxy configured to `http://localhost:5000` for API calls
+- frontend hosted URL: `https://leaderboard-app-lyart.vercel.app/`
 - Socket.IO connects to `http://localhost:5000`

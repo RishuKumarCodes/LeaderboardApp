@@ -15,8 +15,11 @@ const App = () => {
   const [popupUser, setPopupUser] = useState(null);
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
+  const SOCKET_URL =
+    import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+
   useEffect(() => {
-    const socket = io("http://localhost:5000");
+    const socket = io(SOCKET_URL);
 
     socket.on("connect", () => {
       console.log("Connected to server");
