@@ -1,6 +1,3 @@
-// components/TopThree.js
-import React from "react";
-
 const TopThree = ({ users = [], onUserClick }) => {
   const getRankDisplay = (index) => {
     if (index === 0) return "🥇";

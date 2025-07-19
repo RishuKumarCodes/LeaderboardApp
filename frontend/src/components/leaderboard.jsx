@@ -1,4 +1,4 @@
-import TopThree from "./TopThree";
+import TopThree from "./TopThree.jsx";
 
 const Leaderboard = ({ users = [], lastUpdate, onUserClick }) => {
   const safeUsers = Array.isArray(users) ? users : [];
