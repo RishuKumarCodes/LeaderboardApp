@@ -1,5 +1,7 @@
 # A full-stack real-time leaderboard app
 
+![Leaderboard App Screenshot](frontend/src/assets/screenshot.png)
+
 ## Features
 
 - **Real-time Updates**: Leaderboard updates instantly across all connected clients

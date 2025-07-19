@@ -1,21 +1,18 @@
-import React from "react";
+import TopThree from "./TopThree";
 
-const Leaderboard = ({ users = [], lastUpdate }) => {
+const Leaderboard = ({ users = [], lastUpdate, onUserClick }) => {
   const safeUsers = Array.isArray(users) ? users : [];
-
-  const getRankDisplay = (index) => {
-    if (index === 0) return "🥇";
-    if (index === 1) return "🥈";
-    if (index === 2) return "🥉";
-    return `#${index + 1}`;
-  };
+  const topThreeUsers = safeUsers.slice(0, 3);
+  const remaining = safeUsers.slice(3);
 
   return (
-    <div className="p-5 border border-gray-300 rounded-lg bg-white">
+    <div>
       <div className="flex justify-between items-center mb-5">
-        <h3 className="text-xl font-semibold m-0">🏆 Leaderboard</h3>
         {lastUpdate && (
-          <span className="text-xs text-gray-600 italic">
+          <span
+            className="text-xs text-white italic ml-auto"
+            style={{ textShadow: "0 2px 4px rgba(0,0,0,0.75)" }}
+          >
             Last updated: {new Date(lastUpdate).toLocaleTimeString()}
           </span>
         )}
@@ -26,55 +23,63 @@ const Leaderboard = ({ users = [], lastUpdate }) => {
           No users found. Add some users to get started!
         </p>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse shadow-md">
-            <thead>
-              <tr className="bg-blue-600 text-white">
-                <th className="px-4 py-3 text-left border-b-2 border-blue-800">
-                  Rank
-                </th>
-                <th className="px-4 py-3 text-left border-b-2 border-blue-800">
-                  Name
-                </th>
-                <th className="px-4 py-3 text-right border-b-2 border-blue-800">
-                  Total Points
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {safeUsers.map((user, index) => (
-                <tr
-                  key={user._id || user.id || index}
-                  className={`transition-colors duration-300 hover:bg-blue-100 ${
-                    index % 2 === 0 ? "bg-gray-100" : "bg-white"
-                  }`}
-                >
-                  <td className="px-4 py-3 font-bold text-lg">
-                    {getRankDisplay(index)}
-                  </td>
-                  <td className="px-4 py-3 text-base">
-                    {user.name || "Unknown User"}
-                  </td>
-                  <td
-                    className={`px-4 py-3 text-right text-base font-bold ${
-                      (user.totalPoints || 0) > 0
-                        ? "text-green-600"
-                        : "text-gray-500"
-                    }`}
-                  >
-                    {user.totalPoints || 0}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <>
+          {/* now just render TopThree */}
+          <TopThree users={topThreeUsers} onUserClick={onUserClick} />
+
+          {/* remaining users table */}
+          {remaining.length > 0 && (
+            <div className="overflow-x-auto rounded-2xl">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="bg-white text-black">
+                    <th className="px-4 py-3 text-left border-b-1 border-gray-300">
+                      Rank
+                    </th>
+                    <th className="px-4 py-3 text-left border-b-1 border-gray-300">
+                      Name
+                    </th>
+                    <th className="px-4 py-3 text-right border-b-1 border-gray-300">
+                      Total Points
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {remaining.map((user, idx) => {
+                    const rank = idx + 4; // since slice(3) starts at 4th
+                    return (
+                      <tr
+                        key={user._id || user.id || rank}
+                        onClick={() => onUserClick(user)}
+                        className={`transition-colors duration-300 hover:bg-blue-100 cursor-pointer ${
+                          idx % 2 === 0 ? "bg-gray-100" : "bg-white"
+                        }`}
+                      >
+                        <td className="px-4 py-3 font-bold text-lg">#{rank}</td>
+                        <td className="px-4 py-3 text-base">{user.name}</td>
+                        <td
+                          className={`px-4 py-3 text-right text-base font-bold ${
+                            (user.totalPoints || 0) > 0
+                              ? "text-green-600"
+                              : "text-gray-500"
+                          }`}
+                        >
+                          {user.totalPoints || 0}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </>
       )}
 
-      <div className="mt-4 p-3 bg-gray-100 rounded text-sm text-gray-600">
+      <div className="mt-4 p-3 bg-gray-100/80 rounded-2xl text-sm text-gray-600 backdrop-blur-3xl">
         <strong>Total Users:</strong> {safeUsers.length} |{" "}
         <strong>Total Points Awarded:</strong>{" "}
-        {safeUsers.reduce((sum, user) => sum + (user.totalPoints || 0), 0)}
+        {safeUsers.reduce((sum, u) => sum + (u.totalPoints || 0), 0)}
       </div>
     </div>
   );

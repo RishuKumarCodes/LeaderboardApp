@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import io from "socket.io-client";
-import UserSelector from "./components/UserSelector";
-import ClaimButton from "./components/ClaimButton";
 import Leaderboard from "./components/Leaderboard";
+import ClaimPopup from "./components/ClaimPopup";
+import bgImage from "./assets/bg.jpeg";
+import AddUser from "./components/AddUser";
 
 const App = () => {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState(null);
   const [connectionStatus, setConnectionStatus] = useState("connecting");
+  const [showClaimPopup, setShowClaimPopup] = useState(false);
+  const [popupUser, setPopupUser] = useState(null);
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
@@ -58,13 +60,7 @@ const App = () => {
     } catch (error) {
       console.error("Error fetching users:", error);
       alert("Failed to load users. Please refresh the page.");
-    } finally {
-      setLoading(false);
     }
-  };
-
-  const handleUserSelect = (user) => {
-    setSelectedUser(user);
   };
 
   const handleUserAdded = (newUser) => {
@@ -78,6 +74,16 @@ const App = () => {
     console.log("Points claimed:", claimData);
   };
 
+  const handleUserClick = (user) => {
+    setPopupUser(user);
+    setShowClaimPopup(true);
+  };
+
+  const handleClosePopup = () => {
+    setShowClaimPopup(false);
+    setPopupUser(null);
+  };
+
   const getConnectionStatusColor = () => {
     switch (connectionStatus) {
       case "connected":
@@ -89,53 +95,51 @@ const App = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen text-lg">
-        Loading...
-      </div>
-    );
-  }
-
   return (
-    <div className="max-w-screen-xl mx-auto p-5 font-sans">
-      <header className="text-center mb-8 pb-5 border-b-2 border-blue-600">
-        <h1 className="text-blue-600 mb-2 text-4xl font-bold">
-          🎮 Real-Time Leaderboard
-        </h1>
-        <p className="text-gray-600 text-base mb-3">
-          Select a user and claim random points to see the leaderboard update in
-          real-time!
-        </p>
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 text-sm">
-          <div
-            className={`w-2 h-2 rounded-full ${getConnectionStatusColor()}`}
-          ></div>
-          <span className="text-gray-600">
-            {connectionStatus === "connected"
-              ? "Connected"
-              : connectionStatus === "disconnected"
-              ? "Disconnected"
-              : "Connecting..."}
-          </span>
+    <div
+      className="w-[100vw] h-screen bg-cover bg-center overflow-auto"
+      style={{ backgroundImage: `url(${bgImage})` }}
+    >
+      <div className="max-w-screen-xl mx-auto p-5 font-sans">
+        <header className="text-center mb-8 pb-5 ">
+          <h1 className="text-black mb-2 text-4xl font-black">
+            Real-Time Leaderboard
+          </h1>
+          <p className="text-gray-600 text-base mb-3">
+            Select a user and claim random points to see the leaderboard update
+            in real-time!
+          </p>
+        </header>
+
+        <div className="flex items-center justify-between">
+          <AddUser users={users} onUserAdded={handleUserAdded} />
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100/70 text-sm backdrop-blur-2xl">
+            <div
+              className={`w-2 h-2 rounded-full ${getConnectionStatusColor()}`}
+            ></div>
+            <span className="text-gray-600">
+              {connectionStatus === "connected"
+                ? "Connected"
+                : connectionStatus === "disconnected"
+                ? "Disconnected"
+                : "Connecting..."}
+            </span>
+          </div>
         </div>
-      </header>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
-        <UserSelector
+        <Leaderboard
           users={users}
-          selectedUser={selectedUser}
-          onUserSelect={handleUserSelect}
-          onUserAdded={handleUserAdded}
+          lastUpdate={lastUpdate}
+          onUserClick={handleUserClick}
         />
 
-        <ClaimButton
-          selectedUser={selectedUser}
-          onPointsClaimed={handlePointsClaimed}
-        />
+        {showClaimPopup && (
+          <ClaimPopup
+            user={popupUser}
+            onClose={handleClosePopup}
+            onPointsClaimed={handlePointsClaimed}
+          />
+        )}
       </div>
-
-      <Leaderboard users={users} lastUpdate={lastUpdate} />
     </div>
   );
 };
