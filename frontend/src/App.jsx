@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import io from "socket.io-client";
-import Leaderboard from "./assets/Leaderboard.jsx";
+import Leaderboard from "./components/Leaderboard.jsx";
 import ClaimPopup from "./components/ClaimPopup.jsx";
 import AddUser from "./components/AddUser.jsx";
 import bgImage from "./assets/bg.jpeg";
